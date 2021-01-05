@@ -14,6 +14,12 @@ import re
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+from ac_remote import AcRemote
+ac_remote = AcRemote()
+
+from env_monitor import EnvMonitor
+env_monitor = EnvMonitor()
+
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -23,9 +29,6 @@ if channel_secret is None:
 if channel_access_token is None:
     logger.error('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
     sys.exit(1)
-
-from ac_remote import AcRemote
-ac_remote = AcRemote()
 
 def lambda_handler(event, context):
     logger.info(json.dumps(event))
@@ -50,14 +53,14 @@ def lambda_handler(event, context):
         valid_temperature = r'(2[0-9]|30)℃'
         
         if message_text == 'オン':
-            ac_remote.power_on()
+            ac_remote.set_power_on()
             logger.info("Triggering publish to shadow topic to set power to ON")
             message_body = [{
                 'type': 'text',
                 'text': '電源をオンにしました。'
             }]
         elif message_text == 'オフ':
-            ac_remote.power_off()
+            ac_remote.set_power_off()
             logger.info("Triggering publish to shadow topic to set power to OFF")
             message_body = [{
                 'type': 'text',
@@ -184,12 +187,25 @@ def lambda_handler(event, context):
             logger.info("Triggering publish to shadow topic to set temperature")
             message_body = [{
                 'type': 'text',
-                'text': message_text + 'にしました。'
+#                'text': message_text + 'にしました。'
+                'text': str(ac_remote.get_temperature()) + '℃にしました。'
             }]
-        else:
+        elif message_text == '室内環境':
+            env_temperature = env_monitor.get_temperature()
+            env_humidity = env_monitor.get_humidity()
+            env_pressure = env_monitor.get_pressure()
             message_body = [{
                 'type': 'text',
-                'text': 'ご用件は何ですか？',
+                'text': '室内環境は\n温度：' + str(round(env_temperature,1)) + '℃\n湿度：' + str(round(env_humidity,1)) + '%\n気圧：' + str(round(env_pressure,1)) + 'hPa\nです。'
+            }]
+        else:
+            ac_power = ac_remote.get_power()
+            ac_mode = ac_remote.get_mode()
+            ac_temperature = ac_remote.get_temperature()
+            env_temperature = env_monitor.get_temperature()
+            message_body = [{
+                'type': 'text',
+                'text': 'エアコンの設定は\n電源：' + ac_power + '\nモード：' + ac_mode + '\n温度：' + str(ac_temperature) + '℃\nです。\n室温は' + str(round(env_temperature,1)) + '℃です。\nご用件は何ですか？',
                 'quickReply': {
                     'items': [{
                         'type': 'action',
@@ -237,6 +253,14 @@ def lambda_handler(event, context):
                             'type': 'message',
                             'label': '温度',
                             'text': '温度'
+                        }
+                    },
+                    {
+                        'type': 'action',
+                        'action': {
+                            'type': 'message',
+                            'label': '室内環境',
+                            'text': '室内環境'
                         }
                     }]
                 }
