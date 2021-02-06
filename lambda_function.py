@@ -38,7 +38,7 @@ def lambda_handler(event, context):
     hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b64encode(hash).decode('utf-8')
     # Compare X-Line-Signature request header and the signature
-    if signature != event.get('headers').get('X-Line-Signature', ''):
+    if signature != event.get('headers').get('X-Line-Signature', '') and signature != event.get('headers').get('x-line-signature', ''):
         logger.error('validate NG')
         return {'statusCode': 403, 'body': '{}'}
     
@@ -205,7 +205,7 @@ def lambda_handler(event, context):
             env_temperature = env_monitor.get_temperature()
             message_body = [{
                 'type': 'text',
-                'text': 'エアコンの設定は\n電源：' + ac_power + '\nモード：' + ac_mode + '\n温度：' + str(ac_temperature) + '℃\nです。\n室温は' + str(round(env_temperature,1)) + '℃です。\nご用件は何ですか？',
+                'text': 'エアコンは\n電源：' + ac_power + '\nモード：' + ac_mode + '\n温度：' + str(ac_temperature) + '℃\nに設定されています。\n室温は' + str(round(env_temperature,1)) + '℃です。\nご用件は何ですか？',
                 'quickReply': {
                     'items': [{
                         'type': 'action',
