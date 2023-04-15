@@ -33,7 +33,6 @@ if channel_access_token is None:
 def lambda_handler(event, context):
     logger.info(json.dumps(event))
     
-    channel_secret = os.environ['LINE_CHANNEL_SECRET'] # Channel secret string
     body = event.get('body', '') # Request body string
     hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b64encode(hash).decode('utf-8')
