@@ -15,16 +15,22 @@ class EnvMonitor:
         self.update_data()
 
     def get_temperature(self):
-        self.update_data()
-        return float(self.temperature)
+        return self.get_snapshot()["temperature"]
 
     def get_humidity(self):
-        self.update_data()
-        return float(self.humidity)
+        return self.get_snapshot()["humidity"]
 
     def get_pressure(self):
-        self.update_data()
-        return float(self.pressure)
+        return self.get_snapshot()["pressure"]
+
+    def get_snapshot(self, refresh=True):
+        if refresh:
+            self.update_data()
+        return {
+            "temperature": float(self.temperature),
+            "humidity": float(self.humidity),
+            "pressure": float(self.pressure),
+        }
 
     def update_data(self):
         # Read the latest sensor values from one fixed partition key/value pair.

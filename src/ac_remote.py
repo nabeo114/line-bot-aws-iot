@@ -13,15 +13,18 @@ class AcRemote:
         # IoT Data Plane client is used to read/write the thing shadow desired state.
         self.client = boto3.client("iot-data", region_name=os.environ["Region"])
         self.thing_name = os.environ["ThingName"]
+        self.power = 0
+        self.temp = 24
+        self.mode = 3
 
         self.update_data()
 
     def set_power_on(self):
-        self.client.update_thing_shadow(thingName=self.thing_name, payload='{"state":{"desired":{"power":1}}}')
+        self._update_desired_state({"power": 1})
         self.power = 1
 
     def set_power_off(self):
-        self.client.update_thing_shadow(thingName=self.thing_name, payload='{"state":{"desired":{"power":0}}}')
+        self._update_desired_state({"power": 0})
         self.power = 0
 
     def set_temperature(self, temperature):
@@ -31,50 +34,63 @@ class AcRemote:
         if temperature > 30:
             temperature = 30
 
-        self.client.update_thing_shadow(
-            thingName=self.thing_name,
-            payload='{"state":{"desired":{"temp":' + str(int(temperature)) + "}}}",
-        )
+        self._update_desired_state({"temp": int(temperature)})
         self.temp = temperature
 
     def set_mode_heat(self):
-        self.client.update_thing_shadow(thingName=self.thing_name, payload='{"state":{"desired":{"mode":1}}}')
+        self._update_desired_state({"mode": 1})
         self.mode = 1
 
     def set_mode_dry(self):
-        self.client.update_thing_shadow(thingName=self.thing_name, payload='{"state":{"desired":{"mode":2}}}')
+        self._update_desired_state({"mode": 2})
         self.mode = 2
 
     def set_mode_cool(self):
-        self.client.update_thing_shadow(thingName=self.thing_name, payload='{"state":{"desired":{"mode":3}}}')
+        self._update_desired_state({"mode": 3})
         self.mode = 3
 
-    def get_power(self):
-        self.update_data()
-        if self.power == 1:
-            return "ON"
-        return "OFF"
+    def _update_desired_state(self, desired_patch):
+        payload = json.dumps({"state": {"desired": desired_patch}})
+        self.client.update_thing_shadow(thingName=self.thing_name, payload=payload)
 
-    def get_temperature(self):
-        self.update_data()
-        return self.temp
+    def get_state(self, refresh=True):
+        if refresh:
+            self.update_data()
+        return {
+            "power": "ON" if self.power == 1 else "OFF",
+            "temperature": self.temp,
+            "mode": self._mode_to_text(self.mode),
+        }
 
-    def get_mode(self):
-        self.update_data()
-        if self.mode == 1:
+    def get_power(self, refresh=True):
+        return self.get_state(refresh=refresh)["power"]
+
+    def get_temperature(self, refresh=True):
+        return self.get_state(refresh=refresh)["temperature"]
+
+    def get_mode(self, refresh=True):
+        return self.get_state(refresh=refresh)["mode"]
+
+    def _mode_to_text(self, mode):
+        if mode == 1:
             return "HEAT"
-        if self.mode == 2:
+        if mode == 2:
             return "DRY"
-        if self.mode == 3:
+        if mode == 3:
             return "COOL"
         return "COOL"
 
     def update_data(self):
-        # Mirror desired shadow state into local attributes for reply rendering.
+        # Prefer reported values (actual device state) and fall back to desired values.
         response = self.client.get_thing_shadow(thingName=self.thing_name)
         streaming_body = response["payload"]
         shadow_data = json.loads(streaming_body.read())
         logger.info(shadow_data)
-        self.power = shadow_data["state"]["desired"]["power"]
-        self.temp = shadow_data["state"]["desired"]["temp"]
-        self.mode = shadow_data["state"]["desired"]["mode"]
+
+        state = shadow_data.get("state", {})
+        desired = state.get("desired", {})
+        reported = state.get("reported", {})
+
+        self.power = reported.get("power", desired.get("power", self.power))
+        self.temp = reported.get("temp", desired.get("temp", self.temp))
+        self.mode = reported.get("mode", desired.get("mode", self.mode))
