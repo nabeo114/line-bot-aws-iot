@@ -10,6 +10,7 @@ logger.setLevel(logging.INFO)
 
 class AcRemote:
     def __init__(self):
+        # IoT Data Plane client is used to read/write the thing shadow desired state.
         self.client = boto3.client("iot-data", region_name=os.environ["Region"])
         self.thing_name = os.environ["ThingName"]
 
@@ -24,6 +25,7 @@ class AcRemote:
         self.power = 0
 
     def set_temperature(self, temperature):
+        # Clamp to the AC-supported temperature range.
         if temperature < 20:
             temperature = 20
         if temperature > 30:
@@ -68,6 +70,7 @@ class AcRemote:
         return "COOL"
 
     def update_data(self):
+        # Mirror desired shadow state into local attributes for reply rendering.
         response = self.client.get_thing_shadow(thingName=self.thing_name)
         streaming_body = response["payload"]
         shadow_data = json.loads(streaming_body.read())

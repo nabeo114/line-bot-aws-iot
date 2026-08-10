@@ -21,6 +21,7 @@ env_monitor = EnvMonitor()
 
 
 def _get_ssm_parameter(parameter_name):
+    # Read SecureString values from SSM at runtime to avoid hardcoding secrets.
     region_name = os.getenv("Region") or os.getenv("AWS_REGION")
     ssm = boto3.client("ssm", region_name=region_name) if region_name else boto3.client("ssm")
     response = ssm.get_parameter(Name=parameter_name, WithDecryption=True)
@@ -28,6 +29,7 @@ def _get_ssm_parameter(parameter_name):
 
 
 def _load_line_credentials():
+    # Keep backward compatibility: plain env vars work, but SSM param names take precedence.
     secret = os.getenv("LINE_CHANNEL_SECRET", None)
     token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", None)
 
@@ -59,13 +61,14 @@ def lambda_handler(event, context):
     hash = hmac.new(channel_secret.encode("utf-8"), body.encode("utf-8"), hashlib.sha256).digest()
     signature = base64.b64encode(hash).decode("utf-8")
     headers = event.get("headers") or {}
-    # Compare X-Line-Signature request header and the signature
+    # Verify LINE request signature before processing webhook events.
     if not hmac.compare_digest(signature, headers.get("X-Line-Signature", "")) and not hmac.compare_digest(
         signature, headers.get("x-line-signature", "")
     ):
         logger.error("validate NG")
         return {"statusCode": 403, "body": "{}"}
 
+    # Each text message event maps to one AC/shadow operation and one LINE reply.
     for event_data in json.loads(body).get("events", []):
         if event_data["type"] != "message":
             continue
@@ -178,6 +181,7 @@ def lambda_handler(event, context):
             "replyToken": event_data["replyToken"],
             "messages": message_body,
         }
+        # Send reply through LINE Messaging API.
         req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), method="POST", headers=headers)
         with urllib.request.urlopen(req) as res:
             res_body = res.read().decode("utf-8")

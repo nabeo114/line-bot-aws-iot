@@ -27,6 +27,7 @@ class EnvMonitor:
         return float(self.pressure)
 
     def update_data(self):
+        # Read the latest sensor values from one fixed partition key/value pair.
         response = self.table.get_item(Key={os.environ["PartitionKey"]: os.environ["PartitionName"]})
         logger.info(response)
         self.temperature = response["Item"]["temperature"]
