@@ -14,7 +14,7 @@ LINE Messaging API を使って AWS IoT Device Shadow 経由でエアコンを�
 |   `-- images/        # rich menu や UI 用画像
 |-- docs/              # 運用・移行ドキュメント
 |-- infra/
-|   `-- terraform/     # Terraform 定義（次フェーズで実装）
+|   `-- terraform/     # Terraform 定義（運用中）
 |-- scripts/           # デプロイ補助スクリプト
 |-- src/
 |   |-- handler.py     # Lambda 実装本体

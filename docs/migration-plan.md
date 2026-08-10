@@ -10,10 +10,10 @@
 - API Gateway throttling managed by Terraform
 - Lambda code deployment managed by Terraform (`filename` / `source_code_hash`)
 
-## Remaining High-Priority Tasks
+## Current Decisions
 
-1. GitHub Actions で `terraform plan` まで自動化
-2. 監視設定の追加
+- GitHub Actions は lightweight 運用（`terraform fmt` + Python quality checks）を継続
+- 監視設定（CloudWatch Logs retention / alarms）は現時点では見送り
 
 ## Monitoring Backlog (recommended)
 
