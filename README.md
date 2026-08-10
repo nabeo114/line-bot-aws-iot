@@ -50,6 +50,26 @@ Lambda デプロイ用アーティファクトは次のスクリプトで作成�
 
 - [infra/terraform/README.md](infra/terraform/README.md)
 
+## Local development
+
+ローカルでも CI と同じ Python 品質チェックを実行できるようにしています。
+
+### 1. Tooling setup
+
+```bash
+brew install mise
+mise install
+```
+
+### 2. Run checks
+
+```bash
+make setup
+make check
+```
+
+この環境では Python 3.12 と Ruff を使用します。
+
 ## Current Status
 
 - Lambda / API Gateway / スロットリング / SSM 読み取り IAM は Terraform 管理済み

@@ -1,0 +1,15 @@
+[project]
+name = "line-bot-aws-iot"
+version = "0.1.0"
+description = "LINE bot for AWS IoT"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
