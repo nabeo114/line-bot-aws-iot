@@ -58,8 +58,40 @@ terraform apply -var-file=terraform.tfvars
 
 ### 3) LINE シークレット更新
 
-1. SSM Parameter Store の値を更新
-2. `terraform plan -var-file=terraform.tfvars` で差分ゼロを確認
+このリポジトリでは、**SSM パラメータ本体（値）は Terraform で作成/管理しません**。
+理由は、Terraform state にシークレット値を保持しないためです。
+
+1. 必要に応じて SSM パラメータを作成（初回のみ）
+
+```bash
+aws ssm put-parameter \
+  --name "/line-bot-aws-iot/prod/line-channel-secret" \
+  --type SecureString \
+  --value "<LINE_CHANNEL_SECRET>"
+
+aws ssm put-parameter \
+  --name "/line-bot-aws-iot/prod/line-channel-access-token" \
+  --type SecureString \
+  --value "<LINE_CHANNEL_ACCESS_TOKEN>"
+```
+
+2. 値の更新時は `--overwrite` 付きで実行
+
+```bash
+aws ssm put-parameter \
+  --name "/line-bot-aws-iot/prod/line-channel-secret" \
+  --type SecureString \
+  --value "<NEW_LINE_CHANNEL_SECRET>" \
+  --overwrite
+
+aws ssm put-parameter \
+  --name "/line-bot-aws-iot/prod/line-channel-access-token" \
+  --type SecureString \
+  --value "<NEW_LINE_CHANNEL_ACCESS_TOKEN>" \
+  --overwrite
+```
+
+3. `terraform.tfvars` のパラメータ名と一致していることを確認し、`terraform plan -var-file=terraform.tfvars` で差分を確認
 
 ## GitHub Actions (Lightweight)
 
