@@ -50,7 +50,7 @@ jobs:
           pip install ruff
 
       - name: Ruff lint
-        run: ruff check src lambda_function.py
+        run: ruff check src
 
       - name: Ruff format check
-        run: ruff format --check src lambda_function.py
+        run: ruff format --check src

@@ -54,7 +54,6 @@ resource "aws_lambda_function" "line_bot" {
     prevent_destroy = true
     ignore_changes = [
       role,
-      handler,
       publish,
       tags,
       tags_all,

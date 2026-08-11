@@ -40,7 +40,7 @@ variable "lambda_runtime" {
 variable "lambda_handler" {
   description = "Lambda handler entrypoint"
   type        = string
-  default     = "lambda_function.lambda_handler"
+  default     = "src.lambda_handler.lambda_handler"
 }
 
 variable "lambda_timeout" {

@@ -16,7 +16,6 @@ fi
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR" "$DIST_DIR"
 
-cp "$ROOT_DIR/lambda_function.py" "$BUILD_DIR/lambda_function.py"
 cp -R "$ROOT_DIR/src" "$BUILD_DIR/src"
 
 find "$BUILD_DIR" -type d -name "__pycache__" -prune -exec rm -rf {} +
@@ -25,7 +24,7 @@ find "$BUILD_DIR" -type f -name "*.pyc" -delete
 rm -f "$ARTIFACT_PATH"
 (
   cd "$BUILD_DIR"
-  zip -rq "$ARTIFACT_PATH" lambda_function.py src
+  zip -rq "$ARTIFACT_PATH" src
 )
 
 echo "Created: $ARTIFACT_PATH"

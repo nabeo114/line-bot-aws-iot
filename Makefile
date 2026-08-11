@@ -7,10 +7,10 @@ setup:
 	$(PIP) install ruff
 
 lint:
-	$(RUFF) check src lambda_function.py
+	$(RUFF) check src
 
 format:
-	$(RUFF) format src lambda_function.py
+	$(RUFF) format src
 
 check:
 	$(MAKE) lint

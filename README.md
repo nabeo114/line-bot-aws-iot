@@ -17,18 +17,14 @@ LINE Messaging API を使って AWS IoT Device Shadow 経由でエアコンを�
 |   `-- terraform/     # Terraform 定義（運用中）
 |-- scripts/           # デプロイ補助スクリプト
 |-- src/
-|   |-- handler.py     # Lambda 実装本体
+|   |-- lambda_handler.py # Lambda 実装本体
 |   |-- ac_remote.py
 |   `-- env_monitor.py
-`-- lambda_function.py # 互換エントリポイント
 ```
 
 ## Lambda Handler
 
-- 現在の互換エントリポイント: `lambda_function.lambda_handler`
-- 実装本体: `src.handler.lambda_handler`
-
-既存設定との互換性を維持しつつ、今後は `src.handler.lambda_handler` へ統一していく前提です。
+- 現在のハンドラー: `src.lambda_handler.lambda_handler`
 
 LINE 認証情報は SSM Parameter Store (`LINE_CHANNEL_SECRET_PARAM`, `LINE_CHANNEL_ACCESS_TOKEN_PARAM`) を参照する運用です。
 

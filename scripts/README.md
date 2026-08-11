@@ -7,7 +7,7 @@
 Lambda デプロイ用 zip を作成します。
 
 - 入力
-	- `lambda_function.py`
+	- `src/lambda_handler.py`
 	- `src/`
 - 出力
 	- `dist/line-bot-aws-iot-lambda.zip`
