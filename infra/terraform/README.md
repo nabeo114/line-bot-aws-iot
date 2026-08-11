@@ -7,7 +7,7 @@
 - Include:
   - Lambda function
   - API Gateway (REST API + Stage + Method settings)
-  - Lambda 実行ロールへの SSM 読み取りポリシー付与（任意）
+  - Lambda 実行ロールと IAM ポリシー/attachment
 - Exclude:
   - DynamoDB リソース
   - IoT Core リソース
@@ -20,7 +20,6 @@
 - `main.tf`: Lambda / API Gateway / optional IAM policy
 - `outputs.tf`: 出力値
 - `terraform.tfvars.example`: 変数例
-- `import_existing.sh`: 既存環境を新規 import する場合のみ利用
 
 ## Prerequisites (one-time)
 
@@ -121,20 +120,3 @@ Terraform で管理する Lambda 環境変数:
 - `enable_ssm_parameter_access = true` を維持してください。
 - `line_channel_secret_param_name` と `line_channel_access_token_param_name` を空にしないでください。
 
-## Appendix: Import Existing Environment
-
-既存環境を新規に取り込む場合のみ使用します。
-
-1. `terraform.tfvars` を実環境値に更新
-2. `default_tags = {}` を推奨
-3. 必要に応じて `manage_apigw_throttle_settings = false` で開始
-4. 以下を実行
-
-```bash
-export IMPORT_LAMBDA_FUNCTION_NAME="<existing-lambda-name>"
-export IMPORT_REST_API_ID="<rest-api-id>"
-export IMPORT_STAGE_NAME="<stage-name>"
-
-./import_existing.sh
-terraform plan -var-file=terraform.tfvars
-```

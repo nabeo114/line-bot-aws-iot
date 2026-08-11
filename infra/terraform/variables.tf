@@ -26,8 +26,8 @@ variable "lambda_function_name" {
   type        = string
 }
 
-variable "lambda_role_arn" {
-  description = "IAM role ARN used by Lambda"
+variable "lambda_role_name" {
+  description = "IAM role name used by Lambda"
   type        = string
 }
 
@@ -120,10 +120,66 @@ variable "apigw_throttle_burst_limit" {
   default     = 10
 }
 
+variable "manage_apigw_linebot_post" {
+  description = "Manage existing /linebot POST method and integration in Terraform"
+  type        = bool
+  default     = false
+}
+
+variable "apigw_linebot_resource_id" {
+  description = "API Gateway resource ID for /linebot"
+  type        = string
+  default     = ""
+}
+
+variable "apigw_linebot_http_method" {
+  description = "HTTP method for /linebot route"
+  type        = string
+  default     = "POST"
+}
+
+variable "apigw_linebot_resource_path" {
+  description = "Resource path segment for /linebot without leading slash"
+  type        = string
+  default     = "linebot"
+}
+
+variable "apigw_linebot_request_validator_id" {
+  description = "Request validator ID attached to /linebot POST"
+  type        = string
+  default     = ""
+}
+
+variable "apigw_linebot_request_parameters" {
+  description = "Request parameters for /linebot POST"
+  type        = map(bool)
+  default = {
+    "method.request.header.X-Line-Signature" = true
+  }
+}
+
+variable "apigw_invoke_permission_statement_id" {
+  description = "Statement ID for API Gateway invoke permission"
+  type        = string
+  default     = "AllowInvokeFromApiGatewayManaged"
+}
+
 variable "enable_ssm_parameter_access" {
   description = "Attach SSM read policy to Lambda role"
   type        = bool
   default     = false
+}
+
+variable "enable_lambda_device_access_policy" {
+  description = "Attach least-privilege custom policy for IoT shadow and DynamoDB item read"
+  type        = bool
+  default     = true
+}
+
+variable "keep_legacy_managed_policies" {
+  description = "Keep broad AWS managed policies (AWSIoTDataAccess, AmazonDynamoDBReadOnlyAccess) during transition"
+  type        = bool
+  default     = true
 }
 
 variable "line_channel_secret_param_name" {

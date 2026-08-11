@@ -4,7 +4,7 @@ environment          = "prod"
 default_tags         = {}
 
 lambda_function_name = "line-bot-lambda"
-lambda_role_arn      = "arn:aws:iam::123456789012:role/line-bot-lambda-role"
+lambda_role_name     = "line-bot-lambda-role"
 lambda_runtime       = "python3.12"
 lambda_handler       = "src.lambda_handler.lambda_handler"
 lambda_timeout       = 10
@@ -23,6 +23,15 @@ apigw_endpoint_type  = "EDGE"
 manage_apigw_throttle_settings = false
 apigw_throttle_rate_limit  = 5
 apigw_throttle_burst_limit = 10
+manage_apigw_linebot_post = false
+apigw_linebot_resource_id = ""
+apigw_linebot_http_method = "POST"
+apigw_linebot_resource_path = "linebot"
+apigw_linebot_request_validator_id = ""
+apigw_linebot_request_parameters = {
+	"method.request.header.X-Line-Signature" = true
+}
+apigw_invoke_permission_statement_id = "AllowInvokeFromApiGatewayManaged"
 
 enable_ssm_parameter_access = false
 line_channel_secret_param_name       = ""
