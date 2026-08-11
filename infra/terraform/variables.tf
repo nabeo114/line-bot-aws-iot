@@ -170,18 +170,6 @@ variable "enable_ssm_parameter_access" {
   default     = false
 }
 
-variable "enable_lambda_device_access_policy" {
-  description = "Attach least-privilege custom policy for IoT shadow and DynamoDB item read"
-  type        = bool
-  default     = true
-}
-
-variable "keep_legacy_managed_policies" {
-  description = "Keep broad AWS managed policies (AWSIoTDataAccess, AmazonDynamoDBReadOnlyAccess) during transition"
-  type        = bool
-  default     = true
-}
-
 variable "line_channel_secret_param_name" {
   description = "SSM parameter name for LINE channel secret"
   type        = string

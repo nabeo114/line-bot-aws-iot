@@ -239,8 +239,6 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm_read" {
 }
 
 resource "aws_iam_policy" "lambda_device_access" {
-  count = var.enable_lambda_device_access_policy ? 1 : 0
-
   name        = "${var.project_name}-lambda-device-access"
   description = "Least-privilege access for IoT shadow and DynamoDB item reads"
 
@@ -267,22 +265,6 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_device_access" {
-  count = var.enable_lambda_device_access_policy ? 1 : 0
-
   role       = local.lambda_role_name
-  policy_arn = aws_iam_policy.lambda_device_access[0].arn
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_iot_data_access_legacy" {
-  count = var.keep_legacy_managed_policies ? 1 : 0
-
-  role       = local.lambda_role_name
-  policy_arn = "arn:aws:iam::aws:policy/AWSIoTDataAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_dynamodb_readonly_legacy" {
-  count = var.keep_legacy_managed_policies ? 1 : 0
-
-  role       = local.lambda_role_name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+  policy_arn = aws_iam_policy.lambda_device_access.arn
 }
