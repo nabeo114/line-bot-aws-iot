@@ -49,12 +49,16 @@ DEFAULT_QUICK_REPLY_ITEMS = [
 ]
 
 
-def _get_ssm_parameter(parameter_name):
+def _get_ssm_parameters(parameter_names):
     # Read SecureString values from SSM at runtime to avoid hardcoding secrets.
     region_name = os.getenv("Region") or os.getenv("AWS_REGION")
     ssm = boto3.client("ssm", region_name=region_name) if region_name else boto3.client("ssm")
-    response = ssm.get_parameter(Name=parameter_name, WithDecryption=True)
-    return response["Parameter"]["Value"]
+    response = ssm.get_parameters(Names=parameter_names, WithDecryption=True)
+    invalid_parameters = response.get("InvalidParameters", [])
+    if invalid_parameters:
+        raise RuntimeError(f"SSM parameters not found: {invalid_parameters}")
+
+    return {parameter["Name"]: parameter["Value"] for parameter in response["Parameters"]}
 
 
 def _load_line_credentials():
@@ -65,10 +69,13 @@ def _load_line_credentials():
     secret_param_name = os.getenv("LINE_CHANNEL_SECRET_PARAM", None)
     token_param_name = os.getenv("LINE_CHANNEL_ACCESS_TOKEN_PARAM", None)
 
-    if secret_param_name:
-        secret = _get_ssm_parameter(secret_param_name)
-    if token_param_name:
-        token = _get_ssm_parameter(token_param_name)
+    parameter_names = [name for name in (secret_param_name, token_param_name) if name]
+    if parameter_names:
+        parameters = _get_ssm_parameters(parameter_names)
+        if secret_param_name:
+            secret = parameters.get(secret_param_name)
+        if token_param_name:
+            token = parameters.get(token_param_name)
 
     return secret, token
 
