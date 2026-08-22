@@ -1,0 +1,40 @@
+aws_region           = "ap-northeast-1"
+project_name         = "line-bot-aws-iot"
+environment          = "prod"
+default_tags         = {}
+
+lambda_function_name = "line-bot-lambda"
+lambda_role_name     = "line-bot-lambda-role"
+lambda_runtime       = "python3.12"
+lambda_handler       = "src.lambda_handler.lambda_handler"
+lambda_timeout       = 10
+lambda_memory_size   = 128
+iot_thing_name       = "line-bot-device"
+dynamodb_table_name  = "line-bot-env"
+dynamodb_partition_key  = "client_id"
+dynamodb_partition_name = "ESP32Client-0000"
+lambda_zip_path      = "../../dist/line-bot-aws-iot-lambda.zip"
+
+apigw_name           = "line-bot-api"
+apigw_stage_name     = "prod"
+apigw_deployment_id  = "a1b2c3"
+apigw_endpoint_type  = "EDGE"
+
+manage_apigw_throttle_settings = false
+apigw_throttle_rate_limit  = 5
+apigw_throttle_burst_limit = 10
+manage_apigw_linebot_post = false
+apigw_linebot_resource_id = ""
+apigw_linebot_http_method = "POST"
+apigw_linebot_resource_path = "linebot"
+apigw_linebot_request_validator_id = ""
+apigw_linebot_request_parameters = {
+	"method.request.header.X-Line-Signature" = true
+}
+apigw_invoke_permission_statement_id = "AllowInvokeFromApiGatewayManaged"
+
+enable_ssm_parameter_access = true
+line_channel_secret_param_name       = "/line-bot-aws-iot/prod/line-channel-secret"
+line_channel_access_token_param_name = "/line-bot-aws-iot/prod/line-channel-access-token"
+ssm_parameter_arns          = []
+kms_key_arns_for_ssm        = []

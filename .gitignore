@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Terraform local state and cache
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+infra/terraform/backend.hcl
+
+# Terraform CLI override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
