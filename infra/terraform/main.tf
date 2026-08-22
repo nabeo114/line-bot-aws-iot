@@ -74,7 +74,6 @@ resource "aws_iam_role" "lambda_exec" {
   max_session_duration = 3600
 
   lifecycle {
-    create_before_destroy = true
     ignore_changes = [
       tags,
       tags_all,

@@ -33,8 +33,8 @@ apigw_linebot_request_parameters = {
 }
 apigw_invoke_permission_statement_id = "AllowInvokeFromApiGatewayManaged"
 
-enable_ssm_parameter_access = false
-line_channel_secret_param_name       = ""
-line_channel_access_token_param_name = ""
+enable_ssm_parameter_access = true
+line_channel_secret_param_name       = "/line-bot-aws-iot/prod/line-channel-secret"
+line_channel_access_token_param_name = "/line-bot-aws-iot/prod/line-channel-access-token"
 ssm_parameter_arns          = []
 kms_key_arns_for_ssm        = []

@@ -242,7 +242,7 @@ def _handle_set_temperature(temperature):
 
 
 def _parse_temperature_command(message_text):
-    if VALID_TEMPERATURE_PATTERN.match(message_text) is None:
+    if VALID_TEMPERATURE_PATTERN.fullmatch(message_text) is None:
         return None
     return int(message_text.replace("℃", ""))
 
@@ -265,15 +265,16 @@ def lambda_handler(event, context):
         logger.exception("Runtime initialization failed")
         return {"statusCode": 500, "body": "{}"}
 
-    logger.info(json.dumps(event))
+    # Avoid logging the raw event: it may contain user messages, user IDs, and reply tokens.
+    logger.info("Received webhook request: keys=%s", sorted(event.keys()))
 
     body = event.get("body", "")
     if not isinstance(body, str):
         logger.error("Invalid request body type: %s", type(body).__name__)
         return {"statusCode": 400, "body": "{}"}
 
-    hash = hmac.new(channel_secret.encode("utf-8"), body.encode("utf-8"), hashlib.sha256).digest()
-    signature = base64.b64encode(hash).decode("utf-8")
+    digest = hmac.new(channel_secret.encode("utf-8"), body.encode("utf-8"), hashlib.sha256).digest()
+    signature = base64.b64encode(digest).decode("utf-8")
     headers = event.get("headers") or {}
     if not isinstance(headers, dict):
         headers = {}
