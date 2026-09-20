@@ -233,7 +233,7 @@ resource "aws_iam_policy" "lambda_ssm_read" {
 resource "aws_iam_role_policy_attachment" "lambda_ssm_read" {
   count = var.enable_ssm_parameter_access ? 1 : 0
 
-  role       = local.lambda_role_name
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_ssm_read[0].arn
 }
 
@@ -259,11 +259,11 @@ resource "aws_iam_policy" "lambda_device_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  role       = local.lambda_role_name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_device_access" {
-  role       = local.lambda_role_name
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_device_access.arn
 }
