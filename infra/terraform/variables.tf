@@ -16,13 +16,13 @@ variable "environment" {
 }
 
 variable "default_tags" {
-  description = "Default AWS tags to apply. Keep empty during initial import for zero-drift."
+  description = "Additional AWS tags to merge with the always-applied Project/Environment tags."
   type        = map(string)
   default     = {}
 }
 
 variable "lambda_function_name" {
-  description = "Existing Lambda function name"
+  description = "Lambda function name"
   type        = string
 }
 
@@ -82,12 +82,12 @@ variable "lambda_zip_path" {
 }
 
 variable "apigw_name" {
-  description = "Existing API Gateway REST API name"
+  description = "API Gateway REST API name"
   type        = string
 }
 
 variable "apigw_stage_name" {
-  description = "Existing API Gateway stage name"
+  description = "API Gateway stage name"
   type        = string
 }
 
@@ -121,7 +121,7 @@ variable "apigw_throttle_burst_limit" {
 }
 
 variable "manage_apigw_linebot_post" {
-  description = "Manage existing /linebot POST method and integration in Terraform"
+  description = "Manage /linebot POST method and integration in Terraform"
   type        = bool
   default     = false
 }
