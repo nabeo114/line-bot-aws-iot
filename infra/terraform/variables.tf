@@ -16,7 +16,7 @@ variable "environment" {
 }
 
 variable "default_tags" {
-  description = "Default AWS tags to apply. Keep empty during initial import for zero-drift."
+  description = "Additional AWS tags to merge with the always-applied Project/Environment tags."
   type        = map(string)
   default     = {}
 }
